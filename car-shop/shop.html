@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    // Redirect if user is not logged in
+    if (!localStorage.getItem("loggedInUser")) {
+        window.location.href = "login.html";
+    }
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Shop - Browse Cars</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <button id="logout-btn" class="btn" style="margin-left:10px;">Logout</button>
+<script>
+  document.getElementById("logout-btn").addEventListener("click", function() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html"; // Go back to login page
+  });
+</script>
+
+        <h1>Shop Cars</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop.html">Shop Cars</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="garage.html">My Garage</a></li>
+                <li><a href="reviews.html">Reviews</a></li>
+                <li><a href="profile.html">Profile</a></li>
+
+            </ul>
+        </nav>
+        <button id="mode-toggle" class="mode-btn">Switch to Dark Mode</button>
+    </header>
+
+    <section class="shop-container">
+        <h2>Available Cars</h2>
+        <div class="car-grid">
+            <!-- Tesla -->
+            <div class="car-card">
+                <img src="download (1)-red.jpg" alt="Tesla Model S">
+                <h3>Tesla Model S</h3>
+                <p>₦75,000,000</p>
+                <p>Electric luxury sedan with autopilot features.</p>
+                <button class="add-to-cart" data-name="Tesla Model S" data-price="75000000" data-category="electric">Add to Cart</button>
+                <button onclick="window.location.href='customizer.html?car=download (1)&name=Tesla Model S&price=75000000'">Customize</button>
+                <button onclick="window.location.href='finance.html?price=75000000&name=Tesla Model S'">Finance Options</button>
+            </div>
+
+            <!-- BMW X5 -->
+            <div class="car-card">
+                <img src="download (2)-red.jpg" alt="BMW X5">
+                <h3>BMW X5</h3>
+                <p>₦65,000,000</p>
+                <p>Luxury SUV with advanced safety and comfort.</p>
+                <button class="add-to-cart" data-name="BMW X5" data-price="65000000" data-category="luxury-suv">Add to Cart</button>
+                <button onclick="window.location.href='customizer.html?car=download (2)&name=BMW X5&price=65000000'">Customize</button>
+                <button onclick="window.location.href='finance.html?price=65000000&name=BMW X5'">Finance Options</button>
+            </div>
+
+            <!-- Toyota Corolla -->
+            <div class="car-card">
+                <img src="download (3)-red.jpg" alt="Toyota Corolla">
+                <h3>Toyota Corolla</h3>
+                <p>₦18,000,000</p>
+                <p>Reliable sedan with excellent fuel economy.</p>
+                <button class="add-to-cart" data-name="Toyota Corolla" data-price="18000000" data-category="economy">Add to Cart</button>
+                <button onclick="window.location.href='customizer.html?car=download (3)&name=Toyota Corolla&price=18000000'">Customize</button>
+                <button onclick="window.location.href='finance.html?price=18000000&name=Toyota Corolla'">Finance Options</button>
+            </div>
+
+            <!-- Range Rover Sport -->
+            <div class="car-card">
+                <img src="download (4)-red.jpg" alt="Range Rover Sport">
+                <h3>Range Rover Sport</h3>
+                <p>₦90,000,000</p>
+                <p>High-performance SUV with luxury interiors.</p>
+                <button class="add-to-cart" data-name="Range Rover Sport" data-price="90000000" data-category="luxury-suv">Add to Cart</button>
+                <button onclick="window.location.href='customizer.html?car=download (4)&name=Range Rover Sport&price=90000000'">Customize</button>
+                <button onclick="window.location.href='finance.html?price=90000000&name=Range Rover Sport'">Finance Options</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Smart Recommendations -->
+    <section class="recommendations">
+        <h2>You Might Also Like</h2>
+        <div id="recommendation-list" class="car-grid"></div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Car Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        const toggleBtn = document.getElementById("mode-toggle");
+
+        if (localStorage.getItem("mode") === "dark") {
+            document.body.classList.add("dark-mode");
+            toggleBtn.textContent = "Switch to Light Mode";
+        }
+
+        toggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            toggleBtn.textContent = isDark ? "Switch to Light Mode" : "Switch to Dark Mode";
+            localStorage.setItem("mode", isDark ? "dark" : "light");
+        });
+
+        // Recommendation System
+        const cars = [
+            { name: "Tesla Model S", price: 75000000, image: "download (1)-red.jpg", category: "electric" },
+            { name: "BMW X5", price: 65000000, image: "download (2)-red.jpg", category: "luxury-suv" },
+            { name: "Toyota Corolla", price: 18000000, image: "download (3)-red.jpg", category: "economy" },
+            { name: "Range Rover Sport", price: 90000000, image: "download (4)-red.jpg", category: "luxury-suv" }
+        ];
+
+        function showRecommendations() {
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            const lastItem = cart[cart.length - 1];
+            let recommended = [];
+
+            if (lastItem) {
+                const category = cars.find(c => c.name === lastItem.name)?.category;
+                recommended = cars.filter(c => c.category === category && c.name !== lastItem.name);
+            } else {
+                recommended = cars.sort((a, b) => b.price - a.price).slice(0, 2);
+            }
+
+            const container = document.getElementById("recommendation-list");
+            container.innerHTML = "";
+
+            recommended.forEach(car => {
+                const div = document.createElement("div");
+                div.className = "car-card";
+                div.innerHTML = `
+                    <img src="${car.image}" alt="${car.name}">
+                    <h3>${car.name}</h3>
+                    <p>₦${car.price.toLocaleString()}</p>
+                    <button class="add-to-cart" data-name="${car.name}" data-price="${car.price}">Add to Cart</button>
+                    <button onclick="window.location.href='customizer.html?car=${encodeURIComponent(car.image.replace('-red.jpg', ''))}&name=${encodeURIComponent(car.name)}&price=${car.price}'">Customize</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        showRecommendations();
+    </script>
+</body>
+</html>

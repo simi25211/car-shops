@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Reviews - Car Shop</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <button id="logout-btn" class="btn" style="margin-left:10px;">Logout</button>
+<script>
+  document.getElementById("logout-btn").addEventListener("click", function() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html"; // Go back to login page
+  });
+</script>
+
+        <h1>Customer Reviews</h1>
+        <button id="mode-toggle" class="mode-btn">Switch to Dark Mode</button>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop.html">Shop Cars</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="reviews.html">Reviews</a></li>
+                <li><a href="garage.html">My Garage</a></li>
+                <li><a href="profile.html">Profile</a></li>
+
+            </ul>
+        </nav>
+    </header>
+
+    <section class="review-form-section">
+        <h2>Leave a Review</h2>
+        <form id="review-form">
+            <label for="username">Name:</label>
+            <input type="text" id="username" required>
+
+            <label for="review-text">Your Review:</label>
+            <textarea id="review-text" rows="4" required></textarea>
+
+            <label for="review-image">Upload Image (optional):</label>
+            <input type="file" id="review-image" accept="image/*">
+
+            <label for="review-video">Upload Video (optional):</label>
+            <input type="file" id="review-video" accept="video/*">
+
+            <button type="submit" class="btn">Submit Review</button>
+        </form>
+    </section>
+
+    <section class="reviews-display">
+        <h2>All Reviews</h2>
+        <div id="reviews-list">
+            <!-- Reviews will be displayed here dynamically -->
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Car Shop. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        const toggleBtn = document.getElementById("mode-toggle");
+
+        // Check saved mode from previous visit
+        if (localStorage.getItem("mode") === "dark") {
+            document.body.classList.add("dark-mode");
+            toggleBtn.textContent = "Switch to Light Mode";
+        }
+
+        toggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            toggleBtn.textContent = isDark ? "Switch to Light Mode" : "Switch to Dark Mode";
+            localStorage.setItem("mode", isDark ? "dark" : "light");
+        });
+    </script>
+    <script src="assistant.js"></script>
+</body>
+</html>

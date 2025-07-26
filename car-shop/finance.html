@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Finance Calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; }
+        .calculator-container {
+            max-width: 650px;
+            margin: 2rem auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        img { max-width: 100%; border-radius: 8px; margin-bottom: 1rem; }
+        h2, h3 { text-align: center; }
+        label { display: block; margin-top: 1rem; text-align: left; }
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.3rem;
+            font-size: 1rem;
+        }
+        button {
+            margin-top: 1.5rem;
+            width: 100%;
+            padding: 0.7rem;
+            font-size: 1rem;
+            background: #0077cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover { background: #005fa3; }
+        .result { margin-top: 1rem; font-size: 1.2rem; }
+        .actions { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Car Finance Options</h1>
+    </header>
+
+    <div class="calculator-container">
+        <img id="car-image" alt="Car Preview">
+        <h2 id="car-title">Finance Your Car</h2>
+        <p id="car-price-display"></p>
+
+        <label for="down-payment">Down Payment (₦):</label>
+        <input type="number" id="down-payment" placeholder="Enter amount" value="0">
+
+        <label for="interest-rate">Interest Rate (% per year):</label>
+        <input type="number" id="interest-rate" placeholder="e.g. 10" value="10">
+
+        <label for="loan-term">Loan Term (Months):</label>
+        <select id="loan-term">
+            <option value="12">12 Months</option>
+            <option value="24">24 Months</option>
+            <option value="36">36 Months</option>
+            <option value="48">48 Months</option>
+        </select>
+
+        <button id="calculate-btn">Calculate Loan</button>
+        <div class="result" id="loan-result"></div>
+
+        <div class="actions">
+            <button id="share-whatsapp">Share on WhatsApp</button>
+            <button id="add-finance-cart">Add Loan Plan to Cart</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Car Shop. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const carName = params.get("name") || "Selected Car";
+        const carPrice = parseInt(params.get("price")) || 50000000;
+        const carId = params.get("car") || "download (1)"; // Default image id
+
+        const carImage = document.getElementById("car-image");
+        const carTitle = document.getElementById("car-title");
+        const carPriceDisplay = document.getElementById("car-price-display");
+        const loanResult = document.getElementById("loan-result");
+
+        // Load car info
+        carTitle.textContent = `Finance: ${carName}`;
+        carPriceDisplay.textContent = `Car Price: ₦${carPrice.toLocaleString()}`;
+        carImage.src = `${carId}-red.jpg`; // Default color image
+
+        // Calculate loan
+        document.getElementById("calculate-btn").addEventListener("click", () => {
+            const downPayment = parseInt(document.getElementById("down-payment").value) || 0;
+            const interestRate = parseFloat(document.getElementById("interest-rate").value) / 100 || 0;
+            const termMonths = parseInt(document.getElementById("loan-term").value);
+
+            const loanAmount = carPrice - downPayment;
+            const monthlyInterestRate = interestRate / 12;
+            const monthlyPayment = (loanAmount * monthlyInterestRate) /
+                (1 - Math.pow(1 + monthlyInterestRate, -termMonths));
+
+            loanResult.textContent = `Monthly Payment: ₦${monthlyPayment.toFixed(2)} for ${termMonths} months`;
+        });
+
+        // Share loan details via WhatsApp
+        document.getElementById("share-whatsapp").addEventListener("click", () => {
+            const text = `Car: ${carName}\nPrice: ₦${carPrice.toLocaleString()}\n${loanResult.textContent}`;
+            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(url, "_blank");
+        });
+
+        // Add financed car to cart
+        document.getElementById("add-finance-cart").addEventListener("click", () => {
+            const cart = JSON.parse(localStorage.getItem("cart")) || [];
+            const downPayment = parseInt(document.getElementById("down-payment").value) || 0;
+            const interestRate = parseFloat(document.getElementById("interest-rate").value) || 0;
+            const termMonths = parseInt(document.getElementById("loan-term").value);
+
+            const loanPlan = {
+                name: `${carName} (Financed)`,
+                image: `${carId}-red.jpg`,
+                price: carPrice,
+                downPayment,
+                interestRate,
+                termMonths,
+                quantity: 1
+            };
+            cart.push(loanPlan);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            alert("Loan plan added to cart!");
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    // Redirect if user is not logged in
+    if (!localStorage.getItem("loggedInUser")) {
+        window.location.href = "login.html";
+    }
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Shop - Home</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Optional: Make the toggle sit nicely at the top right */
+        header {
+            position: relative;
+        }
+        .mode-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            padding: 8px 12px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        body.dark-mode .mode-btn {
+            background: #f1f1f1;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Car Shop</h1>
+        <button id="mode-toggle" class="mode-btn">Switch to Dark Mode</button>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop.html">Shop Cars</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="reviews.html">Reviews</a></li>
+                <li><a href="garage.html">My Garage</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="profile.html">Profile</a></li>
+
+
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h2>Find Your Dream Car</h2>
+        <p>Browse, review, and purchase your ideal car online.</p>
+        <a class="btn" href="shop.html">Start Shopping</a>
+    </section>
+
+    <section class="featured">
+        <h2>Featured Cars</h2>
+        <div class="car-grid">
+            <div class="car-card">
+                <!-- Updated filename to match shop -->
+                <img src="download (1)-red.jpg" alt="Tesla Model S">
+                <h3>Tesla Model S</h3>
+                <p>₦75,000,000</p>
+                <a href="shop.html" class="btn">View</a>
+            </div>
+            <div class="car-card">
+                <img src="download (2)-red.jpg" alt="BMW X5">
+                <h3>BMW X5</h3>
+                <p>₦65,000,000</p>
+                <a href="shop.html" class="btn">View</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Car Shop. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const toggleBtn = document.getElementById("mode-toggle");
+
+        // Apply saved mode on page load
+        if (localStorage.getItem("mode") === "dark") {
+            document.body.classList.add("dark-mode");
+            toggleBtn.textContent = "Switch to Light Mode";
+        }
+
+        // Toggle dark mode
+        toggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            toggleBtn.textContent = isDark ? "Switch to Light Mode" : "Switch to Dark Mode";
+            localStorage.setItem("mode", isDark ? "dark" : "light");
+        });
+    </script>
+    <script src="assistant.js"></script>
+</body>
+</html>

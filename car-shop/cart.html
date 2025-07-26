@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    // Redirect if user is not logged in
+    if (!localStorage.getItem("loggedInUser")) {
+        window.location.href = "login.html";
+    }
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Car Shop</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: #0077cc; color: white; }
+        img { max-width: 120px; border-radius: 6px; }
+        .cart-total { text-align: right; margin-top: 1.5rem; font-size: 1.3rem; }
+        .btn { display: inline-block; padding: 10px 15px; background: #0077cc; color: white; text-decoration: none; border-radius: 6px; }
+        .btn:hover { background: #005fa3; }
+        .remove-btn { background: #e63946; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 5px; }
+        .remove-btn:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+    <header>
+        <button id="logout-btn" class="btn" style="margin-left:10px;">Logout</button>
+<script>
+  document.getElementById("logout-btn").addEventListener("click", function() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html"; // Go back to login page
+  });
+</script>
+
+        <h1>Your Cart</h1>
+        <button id="mode-toggle" class="mode-btn">Switch to Dark Mode</button>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop.html">Shop Cars</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="reviews.html">Reviews</a></li>
+                <li><a href="garage.html">My Garage</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="cart-container">
+        <h2>Items in Your Cart</h2>
+        <table id="cart-table">
+            <thead>
+                <tr>
+                    <th>Car</th>
+                    <th>Image</th>
+                    <th>Price (₦)</th>
+                    <th>Quantity</th>
+                    <th>Subtotal (₦)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Cart items will load dynamically -->
+            </tbody>
+        </table>
+
+        <div class="cart-total">
+            <h3>Total: <span id="cart-total">₦0</span></h3>
+            <a href="checkout.html" class="btn">Proceed to Checkout</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Car Shop. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const cartTable = document.querySelector("#cart-table tbody");
+        const totalDisplay = document.getElementById("cart-total");
+
+        function renderCart() {
+            cartTable.innerHTML = "";
+            let total = 0;
+
+            if (cart.length === 0) {
+                cartTable.innerHTML = `<tr><td colspan="6">Your cart is empty.</td></tr>`;
+                totalDisplay.textContent = "₦0";
+                return;
+            }
+
+            cart.forEach((item, index) => {
+                const subtotal = item.price * (item.quantity || 1);
+                total += subtotal;
+
+                // If financed car, calculate monthly payment
+                let financeDetails = "";
+                if (item.termMonths) {
+                    const monthlyPayment = ((item.price - (item.downPayment || 0)) * (item.interestRate / 1200)) /
+                        (1 - Math.pow(1 + (item.interestRate / 1200), -item.termMonths));
+                    financeDetails = `
+                        <br><small>
+                            Financed: ${item.termMonths} months @ ${item.interestRate}% <br>
+                            Monthly: ₦${monthlyPayment.toFixed(2)}
+                        </small>
+                    `;
+                }
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.name}${financeDetails}</td>
+                    <td><img src="${item.image || 'placeholder.jpg'}" alt="${item.name}"></td>
+                    <td>₦${item.price.toLocaleString()}</td>
+                    <td>${item.quantity || 1}</td>
+                    <td>₦${subtotal.toLocaleString()}</td>
+                    <td><button class="remove-btn" data-index="${index}">Remove</button></td>
+                `;
+                cartTable.appendChild(row);
+            });
+
+            totalDisplay.textContent = `₦${total.toLocaleString()}`;
+
+            // Remove buttons
+            document.querySelectorAll(".remove-btn").forEach(btn => {
+                btn.addEventListener("click", e => {
+                    const index = e.target.dataset.index;
+                    cart.splice(index, 1);
+                    localStorage.setItem("cart", JSON.stringify(cart));
+                    renderCart();
+                });
+            });
+        }
+
+        renderCart();
+
+        // Dark mode toggle
+        const toggleBtn = document.getElementById("mode-toggle");
+        if (localStorage.getItem("mode") === "dark") {
+            document.body.classList.add("dark-mode");
+            toggleBtn.textContent = "Switch to Light Mode";
+        }
+        toggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            toggleBtn.textContent = isDark ? "Switch to Light Mode" : "Switch to Dark Mode";
+            localStorage.setItem("mode", isDark ? "dark" : "light");
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    // Redirect if user is not logged in
+    if (!localStorage.getItem("loggedInUser")) {
+        window.location.href = "login.html";
+    }
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Garage</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; color: #222; }
+        header { background: #0077cc; color: white; padding: 1rem; text-align: center; }
+        h1 { margin: 0; font-size: 2rem; }
+        .garage-container { max-width: 1100px; margin: 2rem auto; padding: 1rem; }
+        .car-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .car-card img { max-width: 180px; border-radius: 8px; }
+        .car-details { flex: 1; }
+        .car-details h3 { margin: 0; font-size: 1.5rem; }
+        .car-details p { margin: 0.3rem 0; }
+        .actions { display: flex; gap: 1rem; margin-top: 1rem; }
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .remove-btn { background: #e63946; color: white; }
+        .remove-btn:hover { background: #c82333; }
+        .share-btn {
+            background: #28a745; color: white;
+            display: block; margin: 2rem auto; font-size: 1.2rem;
+        }
+        .share-btn:hover { background: #218838; }
+        footer { text-align: center; padding: 1rem; background: #222; color: white; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <button id="logout-btn" class="btn" style="margin-left:10px;">Logout</button>
+<script>
+  document.getElementById("logout-btn").addEventListener("click", function() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html"; // Go back to login page
+  });
+</script>
+
+        <h1>My Garage</h1>
+    </header>
+
+    <div class="garage-container" id="garage-list">
+        <!-- Cars will load here -->
+    </div>
+
+    <button class="share-btn" id="share-garage">Share My Garage on WhatsApp</button>
+
+    <footer>
+        <p>&copy; 2025 Car Shop. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const garageList = document.getElementById("garage-list");
+        let garage = JSON.parse(localStorage.getItem("cart")) || [];
+
+        // Helper: Pick a default image based on car name if no image exists
+        function getCarImage(car) {
+            if (car.image) return car.image;
+
+            const name = car.name.toLowerCase();
+            if (name.includes("bmw")) return "bmw-x5.jpg";
+            if (name.includes("tesla")) return "tesla-model-s.jpg";
+            if (name.includes("toyota")) return "toyota-corolla.jpg";
+            if (name.includes("range rover")) return "range-rover.jpg";
+
+            return "placeholder.jpg"; // fallback
+        }
+
+        function renderGarage() {
+            garageList.innerHTML = "";
+
+            if (garage.length === 0) {
+                garageList.innerHTML = "<p style='text-align:center;'>Your garage is empty.</p>";
+                return;
+            }
+
+            garage.forEach((car, index) => {
+                const isFinanced = car.termMonths !== undefined;
+
+                const monthlyPayment = isFinanced
+                    ? ((car.price - (car.downPayment || 0)) * (car.interestRate / 1200)) /
+                      (1 - Math.pow(1 + (car.interestRate / 1200), -car.termMonths))
+                    : 0;
+
+                const carCard = document.createElement("div");
+                carCard.classList.add("car-card");
+
+                // Use actual saved image or fallback
+                const img = document.createElement("img");
+                img.src = getCarImage(car);
+                img.alt = car.name;
+
+                const details = document.createElement("div");
+                details.classList.add("car-details");
+                details.innerHTML = `
+                    <h3>${car.name}</h3>
+                    <p><strong>Price:</strong> ₦${car.price.toLocaleString()}</p>
+                    ${isFinanced ? `
+                        <p><strong>Loan Term:</strong> ${car.termMonths} months</p>
+                        <p><strong>Down Payment:</strong> ₦${car.downPayment.toLocaleString()}</p>
+                        <p><strong>Interest Rate:</strong> ${car.interestRate}%</p>
+                        <p><strong>Monthly Payment:</strong> ₦${monthlyPayment.toFixed(2)}</p>
+                    ` : ""}
+                    <p><strong>Quantity:</strong> ${car.quantity || 1}</p>
+                `;
+
+                const removeBtn = document.createElement("button");
+                removeBtn.textContent = "Remove";
+                removeBtn.classList.add("remove-btn");
+                removeBtn.addEventListener("click", () => {
+                    garage.splice(index, 1);
+                    localStorage.setItem("cart", JSON.stringify(garage));
+                    renderGarage();
+                });
+
+                const actionsDiv = document.createElement("div");
+                actionsDiv.classList.add("actions");
+                actionsDiv.appendChild(removeBtn);
+
+                carCard.appendChild(img);
+                carCard.appendChild(details);
+                carCard.appendChild(actionsDiv);
+
+                garageList.appendChild(carCard);
+            });
+        }
+
+        document.getElementById("share-garage").addEventListener("click", () => {
+            if (garage.length === 0) {
+                alert("Your garage is empty!");
+                return;
+            }
+            let text = "My Garage:\n";
+            garage.forEach(car => {
+                text += `• ${car.name} - ₦${car.price.toLocaleString()}`;
+                if (car.termMonths) {
+                    text += ` (Financed: ${car.termMonths} months, ₦${car.downPayment.toLocaleString()} down)`;
+                }
+                text += "\n";
+            });
+            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(url, "_blank");
+        });
+
+        renderGarage();
+    </script>
+</body>
+</html>

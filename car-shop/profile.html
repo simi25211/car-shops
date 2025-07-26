@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2 id="welcome"></h2>
+    <button id="logout">Log Out</button>
+
+    <script>
+        // Simulate saved user data (this would usually come from localStorage)
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser')) || {
+            name: "Odusanya Simisola",
+            email: "odusanyasimisola6@gmail.com"
+        };
+
+        // Show only the name (not email/password)
+        document.getElementById('welcome').innerText = `Welcome, ${loggedInUser.name}!`;
+
+        // Handle logout
+        document.getElementById('logout').addEventListener('click', () => {
+            localStorage.removeItem('loggedInUser'); // clear user session
+            window.location.href = 'login.html'; // redirect to login
+        });
+    </script>
+</body>
+</html>
